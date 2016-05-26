@@ -1,0 +1,26 @@
+#!/bin/bash
+POST=prettyjson
+CMD=$(basename $0)
+case ${CMD} in
+  pkgdeps) QUERY=".dependencies";;
+  pkgscripts) QUERY=".scripts";;
+  pkgrepo) QUERY=".repository";;
+  pkgdev) QUERY=".devDependencies";;
+  pkgver) QUERY=".version"; POST="cut -d\" -f2";;
+  pkgname) QUERY=".name"; POST="cut -d\" -f2";;
+  pkgdesc) QUERY=".description"; POST="cut -d\" -f2";;
+  pkgmain) QUERY=".main"; POST="cut -d\" -f2";;
+  pkgauthor) QUERY=".author"; POST="cut -d\" -f2";;
+esac
+
+PKG="package.json"
+if ([ -d "$1" ]) then
+   PKG="$1/$PKG"
+fi
+
+if ([ ! -f ${PKG} ]) then
+  echo "${PKG}: No such file"
+  exit 1
+fi
+
+cat ${PKG} | jq ${QUERY} | ${POST}
